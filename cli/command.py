@@ -95,8 +95,7 @@ class ClientCommand(CliCommand):
                     print(c)
 
             case 'engage':
-                client = self._store.create_client(f'Client {len(self._store.list_clients())}')
-                print(f'{client['id']}: {client['name']}')
+                print(self._store.create_client(f'Client {len(self._store.list_clients())}'))
 
             case _:
                 return False

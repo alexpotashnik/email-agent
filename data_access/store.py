@@ -14,12 +14,12 @@ class DataStore:
         session = Session(self._engine)
         try:
             yield session
-            session.commit()
         except SQLAlchemyError as e:
             session.rollback()
             raise
         finally:
             if not leave_open:
+                session.commit()
                 session.close()
 
     def __init__(self, connection_str: Optional[str] = None):
@@ -28,7 +28,7 @@ class DataStore:
 
     def _list(self, type: Type[IdableType]) -> List[IdableType]:
         with self._get_session(leave_open=True) as session:
-            return  [f'{row[0].id}: {row[0].name}' for row in session.execute(select(type))]
+            return  [row[0] for row in session.execute(select(type))]
 
     def cache_clear(self):
         self._list.cache_clear()  # type: ignore
@@ -41,11 +41,13 @@ class DataStore:
     def list_clients(self):
         return self._list(Client)
 
-    def create_client(self, name):
+    def create_client(self, name) -> Client:
         client = Client(name=name)
         with self._get_session(leave_open = True) as session:
             session.add(client)
-            return {'id': client.id, 'name': client.name}
+            session.commit()
+            session.refresh(client)
+        return client
 
 
     def list_deals(self):
