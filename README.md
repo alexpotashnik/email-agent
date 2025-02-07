@@ -96,7 +96,7 @@ classDiagram
  
 ## Sample conversations
 * "Deal-less"
-  * Provide Market Analysis (general)
+  * Provide market analysis (general)
   * Reply to an engagement request (inbound)
   * Reach out to prospect (outbound)
   * First meeting (introduce set of potential deals)
@@ -108,10 +108,10 @@ classDiagram
   * Price-based
   * Property history
   * Requests to fix
-  * Bidding War
+  * Bidding war
 * Closing
   * Facilitating funds transfer
-  * Taking Possession
+  * Taking possession
   * Celebration
 
 ## Simplifying Assumptions
