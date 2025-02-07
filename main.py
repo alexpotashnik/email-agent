@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from typing import List, Type, Dict
 
-from cli.command import CommandCategoryType, DealsCommand, EnvironmentCommand
+from cli.command import CommandCategoryType, DealsCommand, EnvironmentCommand, ClientCommand
 from data_access.store import DataStore
 
 
@@ -42,7 +42,7 @@ def main():
 
     # TODO: get automatically by reflection, but preserve order
     categories: List[Type[CommandCategoryType]] = [
-        EnvironmentCommand, DealsCommand
+        ClientCommand, EnvironmentCommand, DealsCommand
     ]
 
     store_path = getenv('STORE_PATH')

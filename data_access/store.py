@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, select, desc, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from data_access.models import Idable, IdableType
+from data_access.models import Idable, IdableType, Client, Deal, Engagement
 
 
 class DataStore:
@@ -27,8 +27,8 @@ class DataStore:
         Idable.metadata.create_all(self._engine)
 
     def _list(self, type: Type[IdableType]) -> List[IdableType]:
-        with self._get_session() as session:
-            return [row[0] for row in session.execute(select(type))]
+        with self._get_session(leave_open=True) as session:
+            return  [f'{row[0].id}: {row[0].name}' for row in session.execute(select(type))]
 
     def cache_clear(self):
         self._list.cache_clear()  # type: ignore
@@ -37,3 +37,19 @@ class DataStore:
         with self._get_session():
             Idable.metadata.drop_all(self._engine)
             Idable.metadata.create_all(self._engine)
+
+    def list_clients(self):
+        return self._list(Client)
+
+    def create_client(self, name):
+        client = Client(name=name)
+        with self._get_session(leave_open = True) as session:
+            session.add(client)
+            return {'id': client.id, 'name': client.name}
+
+
+    def list_deals(self):
+        return self._list(Deal)
+
+    def list_engagements(self):
+        return self._list(Engagement)
