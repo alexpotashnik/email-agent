@@ -94,6 +94,26 @@ classDiagram
     Deal "1" -- "0..*" Event 
 ```
  
+## Sample conversations
+* "Deal-less"
+  * Provide Market Analysis (general)
+  * Reply to an engagement request (inbound)
+  * Reach out to prospect (outbound)
+  * First meeting (introduce set of potential deals)
+* Explore a potential deal
+  * Local market analysis
+  * More information about the property
+  * Sway toward purchase
+* Negotiation
+  * Price-based
+  * Property history
+  * Requests to fix
+  * Bidding War
+* Closing
+  * Facilitating funds transfer
+  * Taking Possession
+  * Celebration
+
 ## Simplifying Assumptions
 * Client is only engaged as a buyer (therefore representing one side of the deal)
 * 1 deal per conversation
