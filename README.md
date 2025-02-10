@@ -67,15 +67,15 @@ classDiagram
 sequenceDiagram
   participant User
   participant CLI
-  participant EngagementEngine
+  participant EmailClient
   participant DataStore
   participant GPT
 
   User->>CLI: "advance engagement"
-  CLI->>EngagementEngine: "query next step"
-  EngagementEngine->>DataStore: "query"
-  DataStore->>EngagementEngine: "events, conversation"
-  EngagementEngine->>CLI: "blocked or wait"
+  CLI->>EmailClient: "query next step"
+  EmailClient->>DataStore: "query"
+  DataStore->>EmailClient: "events, conversation"
+  EmailClient->>CLI: "blocked or wait"
   CLI->>User: "no action required      
   
 ```
@@ -85,16 +85,16 @@ sequenceDiagram
 sequenceDiagram 
   participant User
   participant CLI
-  participant EngagementEngine
+  participant EmailClient
   participant DataStore
   participant GPT
 
   User->>CLI: "advance engagement"
-  CLI->>EngagementEngine: "query next step"
-  EngagementEngine->>DataStore: "query"
-  DataStore->>EngagementEngine: "events, conversation"
-  EngagementEngine->>GPT: "prompt"
-  EngagementEngine->>CLI: "email"
+  CLI->>EmailClient: "query next step"
+  EmailClient->>DataStore: "query"
+  DataStore->>EmailClient: "events, conversation"
+  EmailClient->>GPT: "prompt"
+  EmailClient->>CLI: "email"
   CLI->>User: "email"
 
 ```
