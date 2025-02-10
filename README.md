@@ -1,5 +1,9 @@
 # email-assistant
 
+## Simplifying Assumptions
+* Client is only engaged as a buyer (therefore representing one side of the deal)
+* 1 deal per conversation
+
 ## Commands
 * `client`
   * `engage`
@@ -13,6 +17,51 @@
   * `close`
 
 ## Diagrams
+### Persistence
+```mermaid
+classDiagram
+    class Client {
+        -name: string
+        +engage()
+    }
+        
+    class Conversation {
+        -attributes: json
+        -timestamp: datetime
+        +follow_up()
+    }
+    
+    class Deal {
+        -address: varchar
+        -status: varchar
+        +initiate()
+        +negotiate()
+        +close()
+    }
+    
+    class Engagement {
+        -buyer_id: integer
+        -counterparty: varchar
+        +<<static>> list(status)
+        +advance(preview_only: bool)
+    }
+    
+    class Event {
+        -deal_id: integer
+        -attributes: json
+        -timestamp: datetime
+    }
+    
+    class PromptTemplate {
+        -text: varchar
+    }
+
+    Client "1" -- "0..*" Conversation
+    Engagement "1" -- "1" Client : "buyer"
+    Engagement "1" -- "0..*" Deal
+    Deal "1" -- "0..*" Event 
+```
+
 ### No Action Required
 ```mermaid
 sequenceDiagram
@@ -50,50 +99,6 @@ sequenceDiagram
 
 ```
 
-### Persistence
-```mermaid
-classDiagram
-    class Client {
-        -name: string
-        +engage()
-    }
-        
-    class Conversation {
-        -attributes: json
-        -timestamp: datetime
-        +follow_up()
-    }
-    
-    class Deal {
-        -address: varchar
-        -status: varchar
-        +initiate()
-        +negotiate()
-        +close()
-    }
-    
-    class Engagement {
-        -counterparty: varchar
-        +<<static>> list(status)
-        +advance(preview_only: bool)
-    }
-    
-    class Event {
-        -deal_id: integer
-        -attributes: json
-        -timestamp: datetime
-    }
-    
-    class PromptTemplate {
-        -text: varchar
-    }
-
-    Client "1" -- "0..*" Conversation
-    Engagement "1" -- "1" Client : "buyer"
-    Engagement "1" -- "0..*" Deal
-    Deal "1" -- "0..*" Event 
-```
- 
 ## Sample conversations
 * "Deal-less"
   * Provide market analysis (general)
@@ -113,7 +118,3 @@ classDiagram
   * Facilitating funds transfer
   * Taking possession
   * Celebration
-
-## Simplifying Assumptions
-* Client is only engaged as a buyer (therefore representing one side of the deal)
-* 1 deal per conversation
