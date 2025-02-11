@@ -14,7 +14,6 @@ class EngagementCommand(CliCommand):
     def arg_specs(cls) -> Dict[str, List]:
         return {
             'list': [],
-            'create': [],
             'advance': [],
             'close': []
         }
@@ -22,10 +21,8 @@ class EngagementCommand(CliCommand):
     def handle(self, args: Namespace):
         match args.command:
             case 'list':
-                print(self._store.list_engagements())
-
-            case 'create':
-                raise Exception
+                for e in self._store.list_engagements():
+                    print(e)
 
             case 'advance':
                 raise Exception

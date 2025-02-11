@@ -16,7 +16,9 @@ class ClientCommand(CliCommand):
             'list': [],
             'engage': [
                 (['-n', '--name'], {'required': 'true'}),
-                (['-e', '--email'], {'required': 'true'})
+                (['-a', '--email_address'], {'required': 'true'}),
+                (['-b', '--in_or_out_bound'], {'required': 'true'}),
+                (['-e', '--email'])
             ]
         }
 
@@ -27,7 +29,9 @@ class ClientCommand(CliCommand):
                     print(c)
 
             case 'engage':
-                print(self._store.create_client(args.name, args.email))
+                client = self._store.create_client(args.name, args.email_address)
+                engagement = self._store.create_engagement(client)
+                print(engagement)
 
             case _:
                 return False

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, select, desc, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from data_access.models import Idable, IdableType, Client, Engagement
+from data_access.models import Idable, IdableType, Client, Engagement, EngagementStatus
 
 
 class DataStore:
@@ -51,3 +51,16 @@ class DataStore:
 
     def list_engagements(self):
         return self._list(Engagement)
+
+    def create_engagement(self, client: Client):
+        engagement = Engagement(client_id=client.id, status=EngagementStatus.ACTIVE)
+        # client_id: Mapped[int] = mapped_column(ForeignKey('client.id'), nullable=False)
+        # counterparty_name: Mapped[str] = mapped_column(String)
+        # counterparty_email: Mapped[str] = mapped_column(String)
+        # property_address: Mapped[str] = mapped_column(String)
+        # status: Mapped[EngagementStatus] = mapped_column(Enum(EngagementStatus, **_ORM_ENUM), unique=False)
+        with self._get_session(leave_open = True) as session:
+            session.add(engagement)
+            session.commit()
+            session.refresh(engagement)
+        return engagement

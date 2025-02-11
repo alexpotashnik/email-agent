@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import TypeVar, List
+from typing import TypeVar, List, Optional
 
 from sqlalchemy import Column, ForeignKey, String, Integer, Enum, JSON, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -29,6 +29,7 @@ class Client(Idable):
 
 
 class EngagementStatus(StrEnum):
+    PROSPECT = 'prospect'
     ACTIVE = 'active'
     STALE = 'stale'
     CONCLUDED = 'concluded'
@@ -38,13 +39,19 @@ class Engagement(Idable):
     __tablename__ = 'engagement'
 
     client_id: Mapped[int] = mapped_column(ForeignKey('client.id'), nullable=False)
-    counterparty_name: Mapped[str] = mapped_column(String)
-    counterparty_email: Mapped[str] = mapped_column(String)
-    property_address: Mapped[str] = mapped_column(String)
+    counterparty_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    counterparty_email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    property_address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     status: Mapped[EngagementStatus] = mapped_column(Enum(EngagementStatus, **_ORM_ENUM), unique=False)
 
     client: Mapped['Client'] = relationship('Client', foreign_keys=[client_id])
     events: Mapped[List['Event']] = relationship('Event', back_populates='engagement')
+
+    def __repr__(self):
+        optionals = [o for o in [self.counterparty_email, self.counterparty_name, self.property_address] if o]
+        optionals_repr = f'({', '.join(optionals)})' if optionals else ''
+        return f'[{self.id}] {self.client.name}: {self.status.name}' + optionals_repr
+
 
 
 class Conversation(Idable):
