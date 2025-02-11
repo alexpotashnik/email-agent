@@ -8,7 +8,7 @@
 * `client`
   * `engage`
   * `list`
-* `engagment`
+* `engagement`
   * `list`
   * `advance [--preview-only]`
 * `deal`

@@ -6,9 +6,12 @@ from datetime import datetime
 from os import getenv
 from dotenv import load_dotenv
 
-from typing import List, Type, Dict
+from typing import List, Type, Dict, Tuple
 
-from cli.command import CommandCategoryType, DealsCommand, EnvironmentCommand, ClientCommand
+from cli.command import CommandCategoryType
+from cli.client import ClientCommand
+from cli.deals import DealsCommand
+from cli.environment import EnvironmentCommand
 from data_access.store import DataStore
 
 
@@ -30,8 +33,22 @@ def parse_args(argv: List[str], specs: Dict) -> Namespace:
         exit(1)
     command = argv[1]
 
-    parser = ArgumentParser()
-    parsed = parser.parse_args(argv[2:])
+    args_parser = ArgumentParser(prog=get_usage(category, command))
+
+    def create_arg(target, spec):
+        target.add_argument(
+            *(spec[0] if isinstance(spec, Tuple) else spec),
+            **(spec[1] if isinstance(spec, Tuple) and len(spec) > 1 else {}))
+
+    for arg_spec in specs[category][command]:
+        if len(arg_spec) > 1 and all([isinstance(item, Tuple) for item in arg_spec]):
+            group = args_parser.add_mutually_exclusive_group(required=True)
+            for group_member_spec in arg_spec:
+                create_arg(group, group_member_spec)
+        else:
+            create_arg(args_parser, arg_spec)
+
+    parsed = args_parser.parse_args(argv[2:])
     parsed.command_category = category
     parsed.command = command
     return parsed
