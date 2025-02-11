@@ -10,7 +10,7 @@ from typing import List, Type, Dict, Tuple
 
 from cli.command import CommandCategoryType
 from cli.client import ClientCommand
-from cli.deals import DealsCommand
+from cli.engagement import EngagementCommand
 from cli.environment import EnvironmentCommand
 from data_access.store import DataStore
 
@@ -59,7 +59,7 @@ def main():
 
     # TODO: get automatically by reflection, but preserve order
     categories: List[Type[CommandCategoryType]] = [
-        ClientCommand, EnvironmentCommand, DealsCommand
+        ClientCommand, EngagementCommand, EnvironmentCommand
     ]
 
     store_path = getenv('STORE_PATH')

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, select, desc, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from data_access.models import Idable, IdableType, Client, Deal, Engagement
+from data_access.models import Idable, IdableType, Client, Engagement
 
 
 class DataStore:
@@ -41,17 +41,13 @@ class DataStore:
     def list_clients(self):
         return self._list(Client)
 
-    def create_client(self, name) -> Client:
-        client = Client(name=name)
+    def create_client(self, name, email) -> Client:
+        client = Client(name=name, email=email)
         with self._get_session(leave_open = True) as session:
             session.add(client)
             session.commit()
             session.refresh(client)
         return client
-
-
-    def list_deals(self):
-        return self._list(Deal)
 
     def list_engagements(self):
         return self._list(Engagement)

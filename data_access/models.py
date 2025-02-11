@@ -20,63 +20,57 @@ IdableType = TypeVar('IdableType', bound=Idable)
 
 
 class Client(Idable):
-    __tablename__ = "clients"
+    __tablename__ = 'client'
 
     name: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     def __repr__(self):
-        return f'[{self.id}] {self.name}'
+        return f'[{self.id}] {self.name}: {self.email}'
 
 
-class DealStatus(StrEnum):
+class EngagementStatus(StrEnum):
     ACTIVE = 'active'
     STALE = 'stale'
     CONCLUDED = 'concluded'
 
 
-class Deal(Idable):
-    __tablename__ = "deals"
-
-    address: Mapped[str] = mapped_column(String, nullable=False)
-    status: Mapped[DealStatus] = mapped_column(Enum(DealStatus, **_ORM_ENUM), unique=False)
-
-    events: Mapped[List['Event']] = relationship('Event', back_populates='deal')
-
-
 class Engagement(Idable):
-    __tablename__ = "engagements"
+    __tablename__ = 'engagement'
 
-    buyer_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
-    seller_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
-    counterparty: Mapped[str] = mapped_column(String, nullable=False)
+    client_id: Mapped[int] = mapped_column(ForeignKey('client.id'), nullable=False)
+    counterparty_name: Mapped[str] = mapped_column(String)
+    counterparty_email: Mapped[str] = mapped_column(String)
+    property_address: Mapped[str] = mapped_column(String)
+    status: Mapped[EngagementStatus] = mapped_column(Enum(EngagementStatus, **_ORM_ENUM), unique=False)
 
-    buyer: Mapped["Client"] = relationship("Client", foreign_keys=[buyer_id])
-    seller: Mapped["Client"] = relationship("Client", foreign_keys=[seller_id])
+    client: Mapped['Client'] = relationship('Client', foreign_keys=[client_id])
+    events: Mapped[List['Event']] = relationship('Event', back_populates='engagement')
 
 
 class Conversation(Idable):
-    __tablename__ = "conversations"
+    __tablename__ = 'conversation'
 
-    client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
-    deal_id: Mapped[int] = mapped_column(ForeignKey("deals.id"), nullable=True)
+    client_id: Mapped[int] = mapped_column(ForeignKey('client.id'), nullable=False)
+    engagement_id: Mapped[int] = mapped_column(ForeignKey('engagement.id'), nullable=False)
     attributes: Mapped[dict] = mapped_column(JSON)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
-    client: Mapped["Client"] = relationship("Client")
-    deal: Mapped["Deal"] = relationship("Deal")
+    client: Mapped['Client'] = relationship('Client')
+    deal: Mapped['Engagement'] = relationship('Engagement')
 
 
 class Event(Idable):
-    __tablename__ = "events"
+    __tablename__ = 'event'
 
-    deal_id: Mapped[int] = mapped_column(ForeignKey("deals.id"), nullable=True)
+    engagement_id: Mapped[int] = mapped_column(ForeignKey('engagement.id'), nullable=True)
     attributes: Mapped[dict] = mapped_column(JSON)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
-    deal = relationship("Deal", back_populates="events")
+    engagement = relationship('Engagement', back_populates='events')
 
 
 class PromptTemplate(Idable):
-    __tablename__ = "prompt_templates"
+    __tablename__ = 'prompt_templates'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
