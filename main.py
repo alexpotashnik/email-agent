@@ -12,6 +12,7 @@ from cli.command import CommandCategoryType
 from cli.client import ClientCommand
 from cli.engagement import EngagementCommand
 from cli.environment import EnvironmentCommand
+from cli.event import EventCommand
 from data_access.store import DataStore
 
 
@@ -59,7 +60,7 @@ def main():
 
     # TODO: get automatically by reflection, but preserve order
     categories: List[Type[CommandCategoryType]] = [
-        ClientCommand, EngagementCommand, EnvironmentCommand
+        ClientCommand, EngagementCommand, EnvironmentCommand, EventCommand
     ]
 
     store_path = getenv('STORE_PATH')

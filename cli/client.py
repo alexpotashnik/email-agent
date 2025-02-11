@@ -2,6 +2,7 @@ from argparse import Namespace
 from typing import Dict, List
 
 from cli.command import CliCommand
+from data_access.models import EventType
 
 
 class ClientCommand(CliCommand):
@@ -31,7 +32,9 @@ class ClientCommand(CliCommand):
             case 'engage':
                 client = self._store.create_client(args.name, args.email_address)
                 engagement = self._store.create_engagement(client)
-                print(engagement)
+                out = str(engagement)
+                self._store.create_event(engagement, EventType.OUTBOUND_EMAIL)
+                print(out)
 
             case _:
                 return False

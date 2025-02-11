@@ -66,15 +66,25 @@ class Conversation(Idable):
     deal: Mapped['Engagement'] = relationship('Engagement')
 
 
+class EventType(StrEnum):
+    OUTBOUND_EMAIL = 'outbound_email'
+    CUSTOMER_EMAIL = 'customer_email'
+    COUNTERPARTY_EMAIL = 'customer_email'
+    OUTREACH_TIMEOUT = 'outreach_timeout'
+
+
 class Event(Idable):
     __tablename__ = 'event'
 
     engagement_id: Mapped[int] = mapped_column(ForeignKey('engagement.id'), nullable=True)
-    attributes: Mapped[dict] = mapped_column(JSON)
+    attributes: Mapped[dict] = mapped_column(JSON, nullable=False)
+    type: Mapped[EventType] = mapped_column(Enum(EventType, **_ORM_ENUM), unique=False)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     engagement = relationship('Engagement', back_populates='events')
 
+    def __repr__(self):
+        return f'[{self.id}, {self.type.name}, {self.timestamp}] {self.engagement.client.name}: {self.attributes}'
 
 class PromptTemplate(Idable):
     __tablename__ = 'prompt_templates'

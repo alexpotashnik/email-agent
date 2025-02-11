@@ -1,11 +1,12 @@
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Optional, Type, List
 
 from sqlalchemy import create_engine, select, desc, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from data_access.models import Idable, IdableType, Client, Engagement, EngagementStatus
+from data_access.models import Idable, IdableType, Client, Engagement, EngagementStatus, EventType, Event
 
 
 class DataStore:
@@ -38,9 +39,6 @@ class DataStore:
             Idable.metadata.drop_all(self._engine)
             Idable.metadata.create_all(self._engine)
 
-    def list_clients(self):
-        return self._list(Client)
-
     def create_client(self, name, email) -> Client:
         client = Client(name=name, email=email)
         with self._get_session(leave_open = True) as session:
@@ -49,18 +47,34 @@ class DataStore:
             session.refresh(client)
         return client
 
-    def list_engagements(self):
-        return self._list(Engagement)
+    def list_clients(self):
+        return self._list(Client)
 
     def create_engagement(self, client: Client):
         engagement = Engagement(client_id=client.id, status=EngagementStatus.ACTIVE)
-        # client_id: Mapped[int] = mapped_column(ForeignKey('client.id'), nullable=False)
         # counterparty_name: Mapped[str] = mapped_column(String)
         # counterparty_email: Mapped[str] = mapped_column(String)
         # property_address: Mapped[str] = mapped_column(String)
-        # status: Mapped[EngagementStatus] = mapped_column(Enum(EngagementStatus, **_ORM_ENUM), unique=False)
         with self._get_session(leave_open = True) as session:
             session.add(engagement)
             session.commit()
             session.refresh(engagement)
         return engagement
+
+    def list_engagements(self):
+        return self._list(Engagement)
+
+    def create_event(self, engagement: Engagement, type: EventType):
+        event = Event(engagement_id=engagement.id,
+                      type=type,
+                      timestamp=datetime.now(),
+                      attributes={'attrib1': 1, 'attrib2': ['val1', 'value2']})
+        with self._get_session(leave_open = True) as session:
+            session.add(event)
+            session.commit()
+            session.refresh(event)
+        return event
+
+    def list_events(self):
+        return self._list(Event)
+
