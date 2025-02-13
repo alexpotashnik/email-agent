@@ -38,8 +38,8 @@ class DataStore:
 
     def _list(self, type: Type[IdableType], condition = None) -> List[IdableType]:
         query = self._db.query(type)
-        if condition:
-            query.filter(condition)
+        if condition is not None:
+            query = query.filter(condition)
         return query.all()
 
     def cache_clear(self):

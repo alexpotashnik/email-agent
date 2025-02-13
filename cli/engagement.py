@@ -14,7 +14,7 @@ class EngagementCommand(CliCommand):
     def arg_specs(cls) -> Dict[str, List]:
         return {
             'list': [],
-            'advance': [],
+            'compose': [(['-id', '--engagement-id'], {'required': 'true'})],
             'counterparty': [
                 (['-id', '--engagement-id'], {'required': 'true'}),
                 (['-n', '--name'], {'required': 'true'}),
@@ -30,8 +30,11 @@ class EngagementCommand(CliCommand):
                 for e in self._store.list_engagements():
                     print(e)
 
-            case 'advance':
-                raise Exception
+            case 'compose':
+                if response := self._email_agent.compose(args.engagement_id):
+                    print(response)
+                else:
+                    print('No communication recommended at this time.')
 
             case 'counterparty':
                 print(self._store.update_engagement(args.engagement_id, args.name, args.email, args.address))

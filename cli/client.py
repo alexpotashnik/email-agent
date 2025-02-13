@@ -33,9 +33,10 @@ class ClientCommand(CliCommand):
                 client = self._store.create_client(args.name, args.email_address)
                 engagement = self._store.create_engagement(client)
                 result = str(engagement)
-                self._store.create_event(engagement,
-                                         EventType.OUTBOUND_EMAIL if args.bound == 'out' else EventType.CUSTOMER_EMAIL,
-                                         {'text': args.email} if args.email else {})
+                if args.bound == 'in':
+                    self._store.create_event(engagement,
+                                             EventType.CUSTOMER_EMAIL,
+                                             {'text': args.email} if args.email else {})
                 print(result)
 
             case _:
