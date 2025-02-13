@@ -18,7 +18,7 @@ class ClientCommand(CliCommand):
             'engage': [
                 (['-n', '--name'], {'required': 'true'}),
                 (['-a', '--email_address'], {'required': 'true'}),
-                (['-b', '--in_or_out_bound'], {'required': 'true'}),
+                (['-b', '--bound'], {'required': 'true', 'choices': ['in', 'out']}),
                 (['-e', '--email'])
             ]
         }
@@ -32,9 +32,11 @@ class ClientCommand(CliCommand):
             case 'engage':
                 client = self._store.create_client(args.name, args.email_address)
                 engagement = self._store.create_engagement(client)
-                out = str(engagement)
-                self._store.create_event(engagement, EventType.OUTBOUND_EMAIL)
-                print(out)
+                result = str(engagement)
+                self._store.create_event(engagement,
+                                         EventType.OUTBOUND_EMAIL if args.bound == 'out' else EventType.CUSTOMER_EMAIL,
+                                         {'text': args.email} if args.email else {})
+                print(result)
 
             case _:
                 return False

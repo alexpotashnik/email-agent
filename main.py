@@ -64,15 +64,15 @@ def main():
     ]
 
     store_path = getenv('STORE_PATH')
-    stores = DataStore(f'sqlite+pysqlite:///{store_path}')
-    args = parse_args(sys.argv[1:], {c.category: c.arg_specs() for c in categories})
-    for command in [c(stores, args) for c in categories]:
-        if args.command_category == command.category:
-            start = datetime.now()
-            if command.handle(args):
-                print(f'\n{datetime.now() - start}')
-                return
-            break
+    with DataStore.get(f'sqlite+pysqlite:///{store_path}') as store:
+        args = parse_args(sys.argv[1:], {c.category: c.arg_specs() for c in categories})
+        for command in [c(store, args) for c in categories]:
+            if args.command_category == command.category:
+                start = datetime.now()
+                if command.handle(args):
+                    print(f'\n{datetime.now() - start}')
+                    return
+                break
 
     print(f'Unhandled command: {args.command_category} {args.command}')
     exit(1)
