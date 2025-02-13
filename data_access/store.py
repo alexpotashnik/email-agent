@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from typing import Optional, Type, List, Dict
 
-from sqlalchemy import create_engine, select, desc, func
+from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
@@ -31,8 +31,16 @@ class DataStore:
     def __init__(self, db: Session):
         self._db = db
 
-    def _list(self, type: Type[IdableType]) -> List[IdableType]:
-        return  [row[0] for row in self._db.execute(select(type))]
+    def _find(self, type: Type[IdableType], id: int) -> Optional[IdableType]:
+        if not (idable := self._db.query(type).filter(type.id == id).one()):
+            raise Exception(f'{type.__name__} {id} not found')
+        return idable
+
+    def _list(self, type: Type[IdableType], condition = None) -> List[IdableType]:
+        query = self._db.query(type)
+        if condition:
+            query.filter(condition)
+        return query.all()
 
     def cache_clear(self):
         self._list.cache_clear()  # type: ignore
@@ -53,25 +61,41 @@ class DataStore:
 
     def create_engagement(self, client: Client):
         engagement = Engagement(client_id=client.id, status=EngagementStatus.ACTIVE)
-        # counterparty_name: Mapped[str] = mapped_column(String)
-        # counterparty_email: Mapped[str] = mapped_column(String)
-        # property_address: Mapped[str] = mapped_column(String)
         self._db.add(engagement)
         self._db.flush()
         return engagement
 
+    def find_engagement(self, id: int):
+        return self._find(Engagement, id)
+
     def list_engagements(self):
         return self._list(Engagement)
 
-    def create_event(self, engagement: Engagement, type: EventType, attributes: Dict):
+    def update_engagement(self,
+                          engagement_id: int,
+                          counterparty_name: str,
+                          counterparty_email: str,
+                          property_address: str):
+        if not (engagement := self._db.query(Engagement).filter(Engagement.id == engagement_id).first()):
+            raise Exception(f'Engagement {engagement_id} not found')
+
+        engagement.counterparty_name = counterparty_name
+        engagement.counterparty_email = counterparty_email
+        engagement.property_address = property_address
+        self._db.commit()
+        self._db.flush()
+        return engagement
+
+
+    def create_event(self, engagement: Engagement, type: EventType, attributes: Dict = None):
         event = Event(engagement_id=engagement.id,
                       type=type,
                       timestamp=datetime.now(),
-                      attributes=attributes)
+                      attributes=attributes or {})
         self._db.add(event)
         self._db.flush()
         return event
 
-    def list_events(self):
-        return self._list(Event)
+    def list_events(self, engagement: Engagement):
+        return self._list(Event, Event.engagement == engagement)
 

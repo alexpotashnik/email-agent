@@ -53,23 +53,10 @@ class Engagement(Idable):
         return f'[{self.id}] {self.client.name}: {self.status.name}' + optionals_repr
 
 
-
-class Conversation(Idable):
-    __tablename__ = 'conversation'
-
-    client_id: Mapped[int] = mapped_column(ForeignKey('client.id'), nullable=False)
-    engagement_id: Mapped[int] = mapped_column(ForeignKey('engagement.id'), nullable=False)
-    attributes: Mapped[dict] = mapped_column(JSON)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-
-    client: Mapped['Client'] = relationship('Client')
-    deal: Mapped['Engagement'] = relationship('Engagement')
-
-
 class EventType(StrEnum):
     OUTBOUND_EMAIL = 'outbound_email'
     CUSTOMER_EMAIL = 'customer_email'
-    COUNTERPARTY_EMAIL = 'customer_email'
+    COUNTERPARTY_EMAIL = 'counterparty_email'
     OUTREACH_TIMEOUT = 'outreach_timeout'
 
 

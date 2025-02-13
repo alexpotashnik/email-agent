@@ -15,6 +15,12 @@ class EngagementCommand(CliCommand):
         return {
             'list': [],
             'advance': [],
+            'counterparty': [
+                (['-id', '--engagement-id'], {'required': 'true'}),
+                (['-n', '--name'], {'required': 'true'}),
+                (['-e', '--email'], {'required': 'true'}),
+                (['-a', '--address'], {'required': 'true'}),
+            ],
             'close': []
         }
 
@@ -27,7 +33,10 @@ class EngagementCommand(CliCommand):
             case 'advance':
                 raise Exception
 
-            case 'advance':
+            case 'counterparty':
+                print(self._store.update_engagement(args.engagement_id, args.name, args.email, args.address))
+
+            case 'close':
                 raise Exception
 
             case _:
