@@ -11,8 +11,9 @@
   * `OPESNAI_TEMPERATURE` [Optional]: temperature to request from ChatGPT
 
 ## Simplifying Assumptions
-* Client is only engaged as a buyer (therefore representing one side of the deal)
-* 1 deal per conversation
+* Client is only engaged as a buyer, so counterparty is always the seller
+* Single engagement per client, always "active"
+* Event timeouts (e.g. 2 weeks since last response) are calculated by external backgrounder
 
 ## Commands
 * `environment`
