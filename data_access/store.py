@@ -8,7 +8,7 @@ from sqlalchemy import create_engine, desc
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-from data_access.models import Idable, IdableType, Client, Engagement, EngagementStatus, Event, EventType
+from data_access.models import Idable, IdableType, Client, Engagement, Event, EventType
 
 
 
