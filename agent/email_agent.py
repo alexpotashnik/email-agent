@@ -9,15 +9,15 @@ class EmailAgent:
                  agent_name: str,
                  store: DataStore,
                  openai: OpenAI,
-                 openai_model: str = None,
-                 openai_temperature: float = None):
+                 openai_model: str,
+                 openai_temperature: float):
         if not agent_name:
             raise Exception('Missing agent name')
         self._agent_name = agent_name
         self._store = store
         self._openai = openai
-        self._openai_model = openai_model or 'gpt-4'
-        self._openai_temperature = openai_temperature if openai_temperature is not None else 0.7
+        self._openai_model = openai_model
+        self._openai_temperature = openai_temperature
 
     def _compose(self, engagement: Engagement):
         last_event = self._store.find_last_event(engagement)

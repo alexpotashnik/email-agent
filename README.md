@@ -1,5 +1,15 @@
 # email-assistant
 
+## Setup
+* Clone this repository
+* ```pip install -r requirements.txt``` (Developed using Python3.12)
+* Create `.env` in the root of the repository following `.env.example`:
+  * `AGENT_NAME`: full name of the real estate agent to use in emails
+  * `STORE_PATH`: local destination for the sqlite database file
+  * `OPENAI_KEY`: key to use with ChatGPT
+  * `OPENAI_MODEL` [Optional]: name of ChatGPT model to use
+  * `OPESNAI_TEMPERATURE` [Optional]: temperature to request from ChatGPT
+
 ## Simplifying Assumptions
 * Client is only engaged as a buyer (therefore representing one side of the deal)
 * 1 deal per conversation
