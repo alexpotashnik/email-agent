@@ -1,4 +1,4 @@
-# email-assistant
+# Email Agent
 
 ## Setup
 * Clone this repository
