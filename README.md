@@ -75,11 +75,11 @@ sequenceDiagram
   participant DataStore
   participant GPT
 
-  User->>CLI: "advance engagement"
-  CLI->>EmailAgent: "query next step"
-  EmailAgent->>DataStore: "query"
-  DataStore->>EmailAgent: "events, conversation"
-  EmailAgent->>CLI: "blocked or wait"
+  User->>CLI: "compose"
+  CLI->>EmailAgent: "compose"
+  EmailAgent->>DataStore: "get_last_event"
+  DataStore->>EmailAgent: "events"
+  EmailAgent->>CLI: "no action required"
   CLI->>User: "no action required      
   
 ```
@@ -93,10 +93,10 @@ sequenceDiagram
   participant DataStore
   participant GPT
 
-  User->>CLI: "advance engagement"
-  CLI->>EmailAgent: "query next step"
-  EmailAgent->>DataStore: "query"
-  DataStore->>EmailAgent: "events, conversation"
+  User->>CLI: "compose"
+  CLI->>EmailAgent: "compose"
+  EmailAgent->>DataStore: "get_last_event"
+  DataStore->>EmailAgent: "events"
   EmailAgent->>GPT: "prompt"
   EmailAgent->>CLI: "email"
   CLI->>User: "email"
