@@ -78,7 +78,7 @@ def main():
             if args.command_category == command.category:
                 start = datetime.now()
                 if command.handle(args):
-                    print(f'\n{datetime.now() - start}')
+                    print(f'{datetime.now() - start}\n')
                     return
                 break
 
