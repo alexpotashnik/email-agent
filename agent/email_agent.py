@@ -1,7 +1,7 @@
 from typing import Dict
 
 from agent.templates import PromptTemplate
-from data_access.models import EventType
+from data_access.models import EventType, Engagement
 from data_access.store import DataStore
 from openai import OpenAI
 
@@ -21,8 +21,7 @@ class EmailAgent:
         self._openai_model = openai_model or 'gpt-4'
         self._openai_temperature = openai_temperature if openai_temperature is not None else 0.7
 
-    def _compose(self, engagement_id: int):
-        engagement = self._store.find_engagement(engagement_id)
+    def _compose(self, engagement: Engagement):
         last_event = self._store.find_last_event(engagement)
         names = {
             'agent_name': self._agent_name,
@@ -39,18 +38,21 @@ class EmailAgent:
             case EventType.OUTBOUND_EMAIL:
                 pass
             case EventType.OUTREACH_TIMEOUT:
-                # timed_out_event = self._store.get_event(last_event.attributes['timed_out_id'])
-                # return PromptTemplate.FOLLOWUP.format(**{
-                #     **names,
-                #     **{'last_email': timed_out_event.attributes['email']}
-                # })
-                pass
+                timed_out_event = self._store.get_event(last_event.attributes['target_event_id'])
+                return PromptTemplate.FOLLOWUP.format(**{
+                    **names,
+                    **{
+                        'text': timed_out_event.attributes['text'],
+                        'timeout': '1 week' # Hard coded FOR TESTING PURPOSES ONLY. Should be calculated from timestamps
+                    }
+                })
             case _:
                 raise Exception(f'Unexpected event type: {last_event.type}')
 
 
     def compose(self, engagement_id: int, dry_run: bool = True):
-        prompt = self._compose(engagement_id)
+        engagement = self._store.find_engagement(engagement_id)
+        prompt = self._compose(engagement)
         if dry_run:
             return prompt
 
@@ -59,5 +61,7 @@ class EmailAgent:
             messages=[{'role': 'user', 'content': prompt}],
             temperature=self._openai_temperature
         )
-        return response.choices[0].message.content
+        email = response.choices[0].message.content
+        self._store.create_event(engagement, EventType.OUTBOUND_EMAIL, {'text': email})
+        return email
 

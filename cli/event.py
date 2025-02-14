@@ -17,27 +17,31 @@ class EventCommand(CliCommand):
             'list': [
                 (['-eid', '--engagement-id'], {'required': 'true'})
             ],
-            'get-email': [
+            'receive-email': [
                 (['-eid', '--engagement-id'], {'required': 'true'}),
                 (['-s', '--source'], {'required': 'true', 'choices': ['client', 'counterparty']}),
                 (['-e', '--email'])
             ],
-            'timeout': [(['-eid', '--engagement-id'], {'required': 'true'})]
+            'timeout': [(['-t', '--target_event-id'], {'required': 'true'})]
         }
 
     def handle(self, args: Namespace):
-        engagement = self._store.find_engagement(args.engagement_id)
         match args.command:
             case 'list':
+                engagement = self._store.find_engagement(args.engagement_id)
                 for e in self._store.list_events(engagement):
                     print(e)
 
-            case 'get-email':
+            case 'receive-email':
+                engagement = self._store.find_engagement(args.engagement_id)
                 type = EventType.CUSTOMER_EMAIL if args.source == 'client' else EventType.COUNTERPARTY_EMAIL
                 self._store.create_event(engagement, type, {'text': args.email})
 
-            case 'timout':
-                self._store.create_event(engagement, EventType.OUTREACH_TIMEOUT)
+            case 'timeout':
+                event = self._store.get_event(args.target_event_id)
+                self._store.create_event(event.engagement,
+                                         EventType.OUTREACH_TIMEOUT,
+                                         {'target_event_id': args.target_event_id})
 
             case _:
                 return False
