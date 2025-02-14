@@ -60,7 +60,7 @@ class EmailAgent:
     def compose(self, engagement_id: int, dry_run: bool = True):
         engagement = self._store.find_engagement(engagement_id)
         prompt = self._compose(engagement)
-        if dry_run:
+        if dry_run or not prompt:
             return prompt
 
         response = self._openai.chat.completions.create(
