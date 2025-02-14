@@ -1,5 +1,3 @@
-from typing import Dict
-
 from agent.templates import PromptTemplate
 from data_access.models import EventType, Engagement
 from data_access.store import DataStore

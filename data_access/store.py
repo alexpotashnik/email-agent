@@ -60,7 +60,7 @@ class DataStore:
         return self._list(Client)
 
     def create_engagement(self, client: Client):
-        engagement = Engagement(client_id=client.id, status=EngagementStatus.ACTIVE)
+        engagement = Engagement(client_id=client.id)
         self._db.add(engagement)
         self._db.flush()
         return engagement

@@ -28,13 +28,6 @@ class Client(Idable):
         return f'[{self.id}] {self.name}: {self.email}'
 
 
-class EngagementStatus(StrEnum):
-    PROSPECT = 'prospect'
-    ACTIVE = 'active'
-    STALE = 'stale'
-    CONCLUDED = 'concluded'
-
-
 class Engagement(Idable):
     __tablename__ = 'engagement'
 
@@ -42,7 +35,6 @@ class Engagement(Idable):
     counterparty_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     counterparty_email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     property_address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    status: Mapped[EngagementStatus] = mapped_column(Enum(EngagementStatus, **_ORM_ENUM), unique=False)
 
     client: Mapped['Client'] = relationship('Client', foreign_keys=[client_id])
     events: Mapped[List['Event']] = relationship('Event', back_populates='engagement')
@@ -50,7 +42,7 @@ class Engagement(Idable):
     def __repr__(self):
         optionals = [o for o in [self.counterparty_email, self.counterparty_name, self.property_address] if o]
         optionals_repr = f'({', '.join(optionals)})' if optionals else ''
-        return f'[{self.id}] {self.client.name}: {self.status.name}' + optionals_repr
+        return f'[{self.id}] {self.client.name} ' + optionals_repr
 
 
 class EventType(StrEnum):
@@ -72,9 +64,3 @@ class Event(Idable):
 
     def __repr__(self):
         return f'[{self.id}, {self.type.name}, {self.timestamp}] {self.engagement.client.name}: {self.attributes}'
-
-class PromptTemplate(Idable):
-    __tablename__ = 'prompt_templates'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)

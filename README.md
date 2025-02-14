@@ -5,16 +5,19 @@
 * 1 deal per conversation
 
 ## Commands
+* `environment`
+  * `reset`
 * `client`
-  * `engage`
   * `list`
+  * `engage`
 * `engagement`
   * `list`
-  * `advance [--preview-only]`
-* `deal`
-  * `explore`
-  * `negotiate`
-  * `close`
+  * `compose [--dry-run]`
+  * `counterparty`
+* `event`
+  * `list`
+  * `receive-email`
+  * `timeout`
 
 ## Diagrams
 ### Persistence
@@ -22,44 +25,34 @@
 classDiagram
     class Client {
         -name: string
-        +engage()
+        -email: string
     }
         
-    class Conversation {
-        -attributes: json
-        -timestamp: datetime
-        +follow_up()
-    }
-    
-    class Deal {
-        -address: varchar
-        -status: varchar
-        +initiate()
-        +negotiate()
-        +close()
-    }
-    
     class Engagement {
-        -buyer_id: integer
-        -counterparty: varchar
-        +<<static>> list(status)
-        +advance(preview_only: bool)
+        -client_id: integer
+        -counterparty_name: varchar?
+        -counterparty_email: varchar?
+        -property_address: varchar?
+    }
+    
+    class EventType {
+        <<enumeration>>
+        OUTBOUND_EMAIL
+        CUSTOMER_EMAIL
+        COUNTERPARTY_EMAIL
+        OUTREACH_TIMEOUT
     }
     
     class Event {
-        -deal_id: integer
+        -engagment_id: integer
         -attributes: json
+        -type: EventType
         -timestamp: datetime
     }
-    
-    class PromptTemplate {
-        -text: varchar
-    }
 
-    Client "1" -- "0..*" Conversation
     Engagement "1" -- "1" Client : "buyer"
-    Engagement "1" -- "0..*" Deal
-    Deal "1" -- "0..*" Event 
+    Engagement "1" -- "0..*" Event 
+    EventType -- Event
 ```
 
 ### No Action Required
@@ -99,7 +92,7 @@ sequenceDiagram
 
 ```
 
-## Sample conversations
+## Samples of exchanges that inspired the design
 * "Deal-less"
   * Provide market analysis (general)
   * Reply to an engagement request (inbound)
