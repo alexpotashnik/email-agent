@@ -1,18 +1,63 @@
+from typing import Dict
+
 from agent.templates import PromptTemplate
+from data_access.models import EventType
 from data_access.store import DataStore
+from openai import OpenAI
 
 
 class EmailAgent:
-    def __init__(self, agent_name: str, store: DataStore):
+    def __init__(self,
+                 agent_name: str,
+                 store: DataStore,
+                 openai: OpenAI,
+                 openai_model: str = None,
+                 openai_temperature: float = None):
         if not agent_name:
             raise Exception('Missing agent name')
         self._agent_name = agent_name
         self._store = store
+        self._openai = openai
+        self._openai_model = openai_model or 'gpt-4'
+        self._openai_temperature = openai_temperature if openai_temperature is not None else 0.7
 
-    def compose(self, engagement_id: int):
+    def _compose(self, engagement_id: int):
         engagement = self._store.find_engagement(engagement_id)
-        events = self._store.list_events(engagement)
-        if not events:
-            return PromptTemplate.REACHOUT.format(agent_name=self._agent_name, client_name=engagement.client.name)
+        last_event = self._store.find_last_event(engagement)
+        names = {
+            'agent_name': self._agent_name,
+            'client_name': engagement.client.name
+        }
+        if not last_event:
+            return PromptTemplate.REACHOUT.format(**names)
 
-        return None
+        match last_event.type:
+            case EventType.COUNTERPARTY_EMAIL:
+                pass
+            case EventType.CUSTOMER_EMAIL:
+                pass
+            case EventType.OUTBOUND_EMAIL:
+                pass
+            case EventType.OUTREACH_TIMEOUT:
+                # timed_out_event = self._store.get_event(last_event.attributes['timed_out_id'])
+                # return PromptTemplate.FOLLOWUP.format(**{
+                #     **names,
+                #     **{'last_email': timed_out_event.attributes['email']}
+                # })
+                pass
+            case _:
+                raise Exception(f'Unexpected event type: {last_event.type}')
+
+
+    def compose(self, engagement_id: int, dry_run: bool = True):
+        prompt = self._compose(engagement_id)
+        if dry_run:
+            return prompt
+
+        response = self._openai.chat.completions.create(
+            model=self._openai_model,
+            messages=[{'role': 'user', 'content': prompt}],
+            temperature=self._openai_temperature
+        )
+        return response.choices[0].message.content
+

@@ -4,11 +4,11 @@ from contextlib import contextmanager
 from datetime import datetime
 from typing import Optional, Type, List, Dict
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-from data_access.models import Idable, IdableType, Client, Engagement, EngagementStatus, EventType, Event
+from data_access.models import Idable, IdableType, Client, Engagement, EngagementStatus, Event, EventType
 
 
 
@@ -98,4 +98,13 @@ class DataStore:
 
     def list_events(self, engagement: Engagement):
         return self._list(Event, Event.engagement == engagement)
+
+    def find_last_event(self, engagement: Engagement) -> Optional[Event]:
+        return self._db.query(Event)\
+            .filter(Event.engagement_id == engagement.id)\
+            .order_by(desc(Event.timestamp))\
+            .first()
+
+    def get_event(self, event_id: int) -> Event:
+        return self._db.query(Event).filter(Event.id == event_id).one()  # type: ignore
 

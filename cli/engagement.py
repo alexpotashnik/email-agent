@@ -14,7 +14,15 @@ class EngagementCommand(CliCommand):
     def arg_specs(cls) -> Dict[str, List]:
         return {
             'list': [],
-            'compose': [(['-id', '--engagement-id'], {'required': 'true'})],
+            'compose': [
+                (['-id', '--engagement-id'], {'required': 'true'}),
+                (['--dry-run'], {
+                    'action': 'store_true',
+                    'default': False,
+                    'help': 'The call to OpenAI is not be made, only the prompt is displayed, and the system will not '
+                            'consider the email as having been sent.'
+                })
+            ],
             'counterparty': [
                 (['-id', '--engagement-id'], {'required': 'true'}),
                 (['-n', '--name'], {'required': 'true'}),
@@ -31,7 +39,7 @@ class EngagementCommand(CliCommand):
                     print(e)
 
             case 'compose':
-                if response := self._email_agent.compose(args.engagement_id):
+                if response := self._email_agent.compose(args.engagement_id, args.dry_run):
                     print(response)
                 else:
                     print('No communication recommended at this time.')

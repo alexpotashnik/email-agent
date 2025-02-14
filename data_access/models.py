@@ -2,12 +2,12 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TypeVar, List, Optional
 
-from sqlalchemy import Column, ForeignKey, String, Integer, Enum, JSON, DateTime
+from sqlalchemy import ForeignKey, String, Integer, Enum, JSON, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Idable(DeclarativeBase):
     __abstract__ = True
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
 
 _ORM_ENUM = {

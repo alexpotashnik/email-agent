@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 from typing import List, Type, Dict, Tuple
 
+from openai import OpenAI
+
 from agent.email_agent import EmailAgent
 from cli.command import CommandCategoryType
 from cli.client import ClientCommand
@@ -66,8 +68,13 @@ def main():
 
     store_path = getenv('STORE_PATH')
     agent_name = getenv('AGENT_NAME')
+    open_ai = OpenAI(api_key=getenv('OPENAI_KEY'))
     with DataStore.get(f'sqlite+pysqlite:///{store_path}') as store:
-        email_agent = EmailAgent(agent_name, store)
+        email_agent = EmailAgent(agent_name,
+                                 store,
+                                 open_ai,
+                                 getenv('OPENAI_MODEL'),
+                                 float(temp) if (temp := getenv('OPENAI_TEMPERATURE')) else None)
         args = parse_args(sys.argv[1:], {c.category: c.arg_specs() for c in categories})
         for command in [c(store, email_agent, args) for c in categories]:
             if args.command_category == command.category:
