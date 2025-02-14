@@ -30,13 +30,16 @@ class ClientCommand(CliCommand):
                     print(c)
 
             case 'engage':
+                if args.bound == 'in'and not args.email:
+                    raise Exception('Email is required for inbound engagements')
+
                 client = self._store.create_client(args.name, args.email_address)
                 engagement = self._store.create_engagement(client)
                 result = str(engagement)
                 if args.bound == 'in':
                     self._store.create_event(engagement,
                                              EventType.CUSTOMER_EMAIL,
-                                             {'text': args.email} if args.email else {})
+                                             {'text': args.email})
                 print(result)
 
             case _:

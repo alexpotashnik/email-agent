@@ -15,3 +15,6 @@ class PromptTemplate(StrEnum):
                                'property after receiving communication from a seller.'
                                'Agent\'s name is {agent_name}. Client\'s name is {client_name}. '
                                'Seller\'s name is {counterparty} who wrote {text}')
+
+    RESPOND_TO_CUSTOMER = ('Write an email for a real estate agent in response to a client who wrote: {text}. '
+                           'Agent\'s name is {agent_name}. Client\'s name is {client_name}.')

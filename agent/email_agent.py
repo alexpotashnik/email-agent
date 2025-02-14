@@ -40,9 +40,12 @@ class EmailAgent:
                     }
                 })
             case EventType.CUSTOMER_EMAIL:
-                pass
+                return PromptTemplate.RESPOND_TO_CUSTOMER.format(**{
+                    **names,
+                    **{'text': last_event.attributes['text']}
+                })
             case EventType.OUTBOUND_EMAIL:
-                pass
+                return None
             case EventType.OUTREACH_TIMEOUT:
                 timed_out_event = self._store.get_event(last_event.attributes['target_event_id'])
                 return PromptTemplate.FOLLOWUP.format(**{
