@@ -32,7 +32,13 @@ class EmailAgent:
 
         match last_event.type:
             case EventType.COUNTERPARTY_EMAIL:
-                pass
+                return PromptTemplate.RESPOND_TO_COUNTERPARTY.format(**{
+                    **names,
+                    **{
+                        'counterparty': engagement.counterparty_name,
+                        'text': last_event.attributes['text']
+                    }
+                })
             case EventType.CUSTOMER_EMAIL:
                 pass
             case EventType.OUTBOUND_EMAIL:

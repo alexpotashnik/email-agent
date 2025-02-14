@@ -30,7 +30,7 @@ class EventCommand(CliCommand):
             case 'list':
                 engagement = self._store.find_engagement(args.engagement_id)
                 for e in self._store.list_events(engagement):
-                    print(e)
+                    print(f'{e}\n')
 
             case 'receive-email':
                 engagement = self._store.find_engagement(args.engagement_id)

@@ -28,8 +28,7 @@ class EngagementCommand(CliCommand):
                 (['-n', '--name'], {'required': 'true'}),
                 (['-e', '--email'], {'required': 'true'}),
                 (['-a', '--address'], {'required': 'true'}),
-            ],
-            'close': []
+            ]
         }
 
     def handle(self, args: Namespace):
@@ -46,9 +45,6 @@ class EngagementCommand(CliCommand):
 
             case 'counterparty':
                 print(self._store.update_engagement(args.engagement_id, args.name, args.email, args.address))
-
-            case 'close':
-                raise Exception
 
             case _:
                 return False
